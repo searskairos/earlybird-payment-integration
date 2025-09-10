@@ -152,7 +152,7 @@ Receives payment events from Stripe or Airwallex.
 - `stripe-signature` (for Stripe webhooks)
 - `x-signature` (for Airwallex webhooks)
 
-**Stripe Event Example:**
+**Stripe Event Example (truncated):**
 ```json
 {
   "id": "evt_1234567890",
