@@ -45,7 +45,7 @@ A Node.js backend module that receives and records payment event data from third
 
 ```bash
 git clone https://github.com/searskairos/Earlybird_Payment_Integration.git
-cd Earlybird_Payment_Integration
+cd earlybird-payment-integration
 npm install
 ```
 
