@@ -240,21 +240,6 @@ Search payment by transaction ID.
 }
 ```
 
-## 🧪 Testing
-
-Run the test suite:
-
-```bash
-npm test
-```
-
-The tests cover:
-- Webhook processing for both Stripe and Airwallex
-- Duplicate event handling
-- Authentication flows
-- Input validation
-- Error scenarios
-
 ## 📝 Logging
 
 Logs are written to multiple files in the `logs/` directory:
@@ -278,12 +263,6 @@ Log levels: `error`, `warn`, `info`, `debug`
 3. **Duplicate Prevention**: Hash-based deduplication to handle webhook retries
 4. **Modular Structure**: Separate routes, models, and utilities for maintainability
 
-### Assumptions
-- Payment amounts are provided in smallest currency unit (cents for USD)
-- Webhook signatures are provided in headers as documented by providers
-- MongoDB is preferred over SQLite for production scalability
-- Admin users need to be manually assigned the 'admin' role in the database
-
 ## 🤖 AI Tools Usage
 
 This project was developed with assistance from AI tools:
@@ -292,8 +271,7 @@ This project was developed with assistance from AI tools:
 - **Code Structure**: Generated initial project scaffolding and Express.js boilerplate
 - **Webhook Processing**: Helped design event mapping logic for Stripe/Airwallex differences
 - **Security Implementation**: Assisted with JWT authentication and webhook signature verification
-- **Documentation**: Generated comprehensive API documentation and setup instructions
-- **Testing**: Created test cases and Jest configuration
+- **Documentation**: Helped creating comprehensive API documentation and setup instructions
 
 ### AI-Assisted Development Benefits:
 - Rapid prototyping of complex authentication flows
@@ -312,18 +290,16 @@ This project was developed with assistance from AI tools:
 Given more time, I would enhance the project with:
 
 ### Technical Improvements
-1. **Caching Layer**: Redis for frequently accessed payment data
-2. **Message Queue**: Bull/Agenda for reliable webhook processing
-3. **Database Migrations**: Automated schema versioning
+1. **Additional Events**: Would integrate rest of additional events from Stripe and Airwallex
+2. **Caching Layer**: Redis for frequently accessed payment data
+3. **Message Queue**: Bull/BullMQ for reliable webhook processing
 4. **API Versioning**: Support for multiple API versions
 5. **GraphQL API**: More flexible data querying
 6. **Microservices**: Split into separate services for auth, webhooks, and reporting
 
 ### Monitoring & Observability
-1. **Metrics Collection**: Prometheus/Grafana for system metrics
-2. **Distributed Tracing**: Jaeger for request tracing
-3. **Health Checks**: Comprehensive health monitoring
-4. **Alerting**: PagerDuty integration for critical failures
+1. **Health Checks**: Comprehensive health monitoring
+2. **Alerting**: PagerDuty integration for critical failures
 
 ### Security Enhancements
 1. **API Rate Limiting**: Per-user rate limiting

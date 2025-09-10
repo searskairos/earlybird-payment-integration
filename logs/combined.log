@@ -147,3 +147,9 @@
 {"level":"info","message":"Server running on port 3000","service":"earlybird-payment-integration","timestamp":"2025-09-10 14:58:52"}
 {"level":"info","message":"Environment: development","service":"earlybird-payment-integration","timestamp":"2025-09-10 14:58:52"}
 {"level":"info","message":"Connected to MongoDB","service":"earlybird-payment-integration","timestamp":"2025-09-10 14:58:54"}
+{"level":"info","message":"Server running on port 3000","service":"earlybird-payment-integration","timestamp":"2025-09-10 15:06:35"}
+{"level":"info","message":"Environment: test","service":"earlybird-payment-integration","timestamp":"2025-09-10 15:06:35"}
+{"level":"info","message":"Connected to MongoDB","service":"earlybird-payment-integration","timestamp":"2025-09-10 15:06:37"}
+{"level":"info","message":"Server running on port 3000","service":"earlybird-payment-integration","timestamp":"2025-09-10 15:09:06"}
+{"level":"info","message":"Environment: test","service":"earlybird-payment-integration","timestamp":"2025-09-10 15:09:06"}
+{"level":"info","message":"Connected to MongoDB","service":"earlybird-payment-integration","timestamp":"2025-09-10 15:09:08"}

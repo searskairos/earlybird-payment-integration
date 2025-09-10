@@ -147,3 +147,9 @@
 2025-09-10 14:58:52 [INFO]: Server running on port 3000 {"service":"earlybird-payment-integration"}
 2025-09-10 14:58:52 [INFO]: Environment: development {"service":"earlybird-payment-integration"}
 2025-09-10 14:58:54 [INFO]: Connected to MongoDB {"service":"earlybird-payment-integration"}
+2025-09-10 15:06:35 [INFO]: Server running on port 3000 {"service":"earlybird-payment-integration"}
+2025-09-10 15:06:35 [INFO]: Environment: test {"service":"earlybird-payment-integration"}
+2025-09-10 15:06:37 [INFO]: Connected to MongoDB {"service":"earlybird-payment-integration"}
+2025-09-10 15:09:06 [INFO]: Server running on port 3000 {"service":"earlybird-payment-integration"}
+2025-09-10 15:09:06 [INFO]: Environment: test {"service":"earlybird-payment-integration"}
+2025-09-10 15:09:08 [INFO]: Connected to MongoDB {"service":"earlybird-payment-integration"}
