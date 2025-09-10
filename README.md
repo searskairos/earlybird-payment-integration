@@ -1,15 +1,15 @@
-# Earlybird AI Payment Integration Backend
+# Earlybird Payment Integration Backend
 
 A Node.js backend module that receives and records payment event data from third-party payment gateways (Stripe and Airwallex) into an internal accounting ledger system.
 
 ## 🏗️ Architecture Overview
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Payment       │    │   Node.js        │    │   MongoDB       │
-│   Gateway       │───▶│   Backend        │───▶│   Database      │
-│ (Stripe/Airwallex)│    │   Server         │    │   Ledger        │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌─────────────────┐     ┌──────────────────┐    ┌─────────────────┐
+│   Payment       │     │   Node.js        │    │   MongoDB       │
+│   Gateway       │───▶│    Backend       │───▶│   Database      │
+│ (Stripe/Airwallex)    │    Server        │    │   Ledger        │
+└─────────────────┘     └──────────────────┘    └─────────────────┘
                               │
                               ▼
                        ┌──────────────────┐
@@ -44,8 +44,8 @@ A Node.js backend module that receives and records payment event data from third
 ### 1. Clone and Install Dependencies
 
 ```bash
-git clone <repository-url>
-cd earlybird-payment-integration
+git clone https://github.com/searskairos/Earlybird_Payment_Integration.git
+cd Earlybird_Payment_Integration
 npm install
 ```
 
@@ -150,7 +150,7 @@ Receives payment events from Stripe or Airwallex.
 
 **Headers:**
 - `stripe-signature` (for Stripe webhooks)
-- `x-airwallex-signature` (for Airwallex webhooks)
+- `x-signature` (for Airwallex webhooks)
 
 **Stripe Event Example:**
 ```json
@@ -330,17 +330,3 @@ Given more time, I would enhance the project with:
 2. **Encryption**: Field-level encryption for sensitive data
 3. **Audit Trails**: Complete audit logging for compliance
 4. **RBAC**: More granular role-based permissions
-
-### Developer Experience
-1. **Docker**: Containerization for easy deployment
-2. **CI/CD Pipeline**: Automated testing and deployment
-3. **API Client**: SDK generation for frontend integration
-4. **Interactive Documentation**: Swagger/OpenAPI integration
-
-## 📞 Support
-
-For questions or issues, please check the logs in the `logs/` directory or review the comprehensive error messages returned by the API endpoints.
-
-## 📄 License
-
-MIT License - see LICENSE file for details.

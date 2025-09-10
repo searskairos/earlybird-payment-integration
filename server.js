@@ -70,7 +70,7 @@ app.get('/health', (req, res) => {
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: 'Earlybird AI Payment Integration API',
+    message: 'Earlybird Payment Integration API',
     version: '1.0.0',
     endpoints: {
       auth: '/auth/google',

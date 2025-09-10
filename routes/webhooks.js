@@ -8,8 +8,17 @@ const router = express.Router();
 
 // Webhook signature verification
 const verifyWebhookSignature = (req, res, next) => {
-  const signature = req.headers['stripe-signature'] || req.headers['x-airwallex-signature'];
-  const payload = req.body;
+  const stripeSignature = req.headers['stripe-signature'];
+  const airwallexSignature = req.headers['x-signature'];
+  const signature = stripeSignature || airwallexSignature;
+  
+  console.log('=== WEBHOOK SIGNATURE VERIFICATION ===');
+  console.log('Headers received:', Object.keys(req.headers));
+  console.log('Stripe signature:', stripeSignature);
+  console.log('Airwallex signature (x-signature):', airwallexSignature);
+  console.log('Final signature selected:', signature);
+  console.log('Body type:', typeof req.body);
+  console.log('Body is Buffer:', Buffer.isBuffer(req.body));
   
   if (!signature) {
     logger.warn('Webhook received without signature');
@@ -17,8 +26,9 @@ const verifyWebhookSignature = (req, res, next) => {
   }
 
   // Store raw body and signature for processing
-  req.rawBody = payload;
+  req.rawBody = req.body;
   req.webhookSignature = signature;
+  req.isAirwallex = !!airwallexSignature;
   next();
 };
 
@@ -51,7 +61,7 @@ const parseStripeEvent = (rawBody, signature) => {
 };
 
 // Parse Airwallex webhook events
-const parseAirwallexEvent = (rawBody, signature) => {
+const parseAirwallexEvent = (rawBody, signature, timestamp) => {
   try {
     const expectedSignature = crypto
       .createHmac('sha256', process.env.AIRWALLEX_WEBHOOK_SECRET || 'test_secret')
@@ -61,7 +71,7 @@ const parseAirwallexEvent = (rawBody, signature) => {
     if (!crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(signature))) {
       throw new Error('Invalid signature');
     }
-
+    
     const event = JSON.parse(rawBody.toString());
     return event;
   } catch (error) {
@@ -141,7 +151,7 @@ const mapStripeEvent = (stripeEvent) => {
 // Map Airwallex events to our standard format
 const mapAirwallexEvent = (airwallexEvent) => {
   const { name, data } = airwallexEvent;
-
+  
   let status;
   switch (name) {
     case 'payment_intent.succeeded':
@@ -165,7 +175,7 @@ const mapAirwallexEvent = (airwallexEvent) => {
     return {
       transaction_id: refund.id,
       amount: Math.round(refund.amount * 100), // Airwallex refunds are in dollars, convert to cents
-      currency: refund.currency.toUpperCase(),
+      currency: (refund.currency || 'USD').toUpperCase(),
       status,
       timestamp: new Date(refund.created_at),
       source: 'airwallex',
@@ -181,22 +191,29 @@ const mapAirwallexEvent = (airwallexEvent) => {
       }
     };
   } else {
-    // For payment_intent and payment_attempt events, data is the payment object
-    const payment = data;
+    // For payment_intent and payment_attempt events, data contains the object
+    const payment = data.object;
+    
     return {
       transaction_id: payment.id,
-      amount: Math.round(payment.amount * 100), // Airwallex amounts are in dollars, convert to cents
+      amount: Math.round(payment.amount * 100), // Airwallex amounts are already in base units, convert to cents
       currency: payment.currency.toUpperCase(),
       status,
       timestamp: new Date(payment.created_at),
       source: 'airwallex',
-      customer_email: payment.customer?.email,
+      customer_email: payment.latest_payment_attempt?.payment_method?.card?.billing?.email || 'unknown@airwallex.com',
       raw_event: airwallexEvent,
       webhook_id: airwallexEvent.id,
       metadata: {
-        payment_method: payment.payment_method?.type,
-        description: payment.description,
-        merchant_order_id: payment.merchant_order_id
+        payment_method: payment.latest_payment_attempt?.payment_method?.type,
+        description: payment.descriptor,
+        merchant_order_id: payment.merchant_order_id,
+        original_amount: payment.original_amount,
+        original_currency: payment.original_currency,
+        authorization_code: payment.latest_payment_attempt?.authorization_code,
+        payment_attempt_id: payment.latest_payment_attempt?.id,
+        card_last4: payment.latest_payment_attempt?.payment_method?.card?.last4,
+        card_brand: payment.latest_payment_attempt?.payment_method?.card?.brand
       }
     };
   }
@@ -261,8 +278,10 @@ router.post('/payment', verifyWebhookSignature, async (req, res) => {
     if (req.headers['stripe-signature']) {
       event = parseStripeEvent(rawBody, webhookSignature);
       eventData = mapStripeEvent(event);
-    } else if (req.headers['x-airwallex-signature']) {
-      event = parseAirwallexEvent(rawBody, webhookSignature);
+    } else if (req.headers['x-signature']) {
+      // Airwallex webhook - get timestamp from headers
+      const timestamp = req.headers['x-timestamp'] || Date.now().toString();
+      event = parseAirwallexEvent(rawBody, webhookSignature, timestamp);
       eventData = mapAirwallexEvent(event);
     } else {
       return res.status(400).json({ error: 'Unknown webhook source' });
