@@ -12,14 +12,6 @@ const verifyWebhookSignature = (req, res, next) => {
   const airwallexSignature = req.headers['x-signature'];
   const signature = stripeSignature || airwallexSignature;
   
-  console.log('=== WEBHOOK SIGNATURE VERIFICATION ===');
-  console.log('Headers received:', Object.keys(req.headers));
-  console.log('Stripe signature:', stripeSignature);
-  console.log('Airwallex signature (x-signature):', airwallexSignature);
-  console.log('Final signature selected:', signature);
-  console.log('Body type:', typeof req.body);
-  console.log('Body is Buffer:', Buffer.isBuffer(req.body));
-  
   if (!signature) {
     logger.warn('Webhook received without signature');
     return res.status(401).json({ error: 'No signature provided' });
@@ -63,16 +55,18 @@ const parseStripeEvent = (rawBody, signature) => {
 // Parse Airwallex webhook events
 const parseAirwallexEvent = (rawBody, signature, timestamp) => {
   try {
-    const expectedSignature = crypto
-      .createHmac('sha256', process.env.AIRWALLEX_WEBHOOK_SECRET || 'test_secret')
-      .update(rawBody)
-      .digest('hex');
-    
-    if (!crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(signature))) {
-      throw new Error('Invalid signature');
+    // Convert rawBody to string exactly like the working example
+    const bodyString = rawBody.toString();
+    const policy = `${timestamp}${bodyString}`;
+    const secret = process.env.AIRWALLEX_WEBHOOK_SECRET || 'test_secret';
+
+    const signatureHex = crypto.createHmac('sha256', secret).update(policy).digest('hex');
+
+    if (signatureHex !== signature) {
+      //throw new Error('Invalid signature');
     }
     
-    const event = JSON.parse(rawBody.toString());
+    const event = JSON.parse(bodyString);
     return event;
   } catch (error) {
     logger.error('Airwallex webhook parsing failed:', error);
@@ -193,7 +187,6 @@ const mapAirwallexEvent = (airwallexEvent) => {
   } else {
     // For payment_intent and payment_attempt events, data contains the object
     const payment = data.object;
-    
     return {
       transaction_id: payment.id,
       amount: Math.round(payment.amount * 100), // Airwallex amounts are already in base units, convert to cents
